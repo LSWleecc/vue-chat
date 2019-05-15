@@ -16,10 +16,28 @@
           preview-title-enable="true"
           preview-nav-enable="true">
       </div>
-      <span v-if="msg">
+      <span v-if="msg && !type">
           <span v-html="linkMsg" class="msg"></span>
-  <!-- {{msg | link}} -->
       </span>
+      <h1 class="msg" v-if="type">
+        <!--<el-form :inline="true" :model="formInline" class="demo-form-inline">-->
+          <!--<el-form-item label="审批人">-->
+            <!--<el-input v-model="formInline.user" placeholder="审批人"></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="活动区域">-->
+            <!--<el-select v-model="formInline.region" placeholder="活动区域">-->
+              <!--<el-option label="区域一" value="shanghai"></el-option>-->
+              <!--<el-option label="区域二" value="beijing"></el-option>-->
+            <!--</el-select>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item>-->
+            <!--<el-button type="primary" @click="onSubmit">查询</el-button>-->
+          <!--</el-form-item>-->
+        <!--</el-form>-->
+      </h1>
+      <div v-if="videoSrc" class="videoSrc">
+        <video :src="videoSrc"  width="200px" height="150px"  controls="controls"></video>
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +46,7 @@
   import dateFormat from "../utils/date";
   import { inHTMLData, uriInUnQuotedAttr } from "xss-filters-es6";
   export default {
-    props: ["name", "img", "msg", "head", "mytime", "is-self", "container"],
+    props: ["name", "img", "msg", "head", "mytime", "is-self", "container" , "videoSrc" , "type" ],
     computed: {
       getdate() {
         return dateFormat(new Date(this.mytime), "yyyy-MM-dd HH:mm:ss");
@@ -48,11 +66,11 @@
       },
       avatar() {
         let avatar = this.head;
-        const reg = /\.\/static\/img\/(\d+)\.jpg/;
-        const matches = this.head.match(reg);
-        if (matches) {
-          avatar = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
-        }
+//        const reg = /\.\/static\/img\/(\d+)\.jpg/;
+//        const matches = this.head.match(reg);
+//        if (matches) {
+//          avatar = `//s3.qiufengh.com/avatar/${matches[1]}.jpeg`;
+//        }
         return `${avatar}?imageView2/2/w/120/h/120`;
       },
       pic() {
@@ -82,6 +100,10 @@
 
       .img {
         max-width: 200px;
+      }
+      .videoSrc {
+        max-width: 200px;
+        max-height: 150px;
       }
 
       .name {
@@ -140,10 +162,10 @@
       float: left;
       margin-left: 80px;
       color: #313035;
-
+      background: gainsboro;
       &:after {
         left: -15px;
-        border-top: 15px solid #fff;
+        border-top: 15px solid gainsboro;
         border-left: 15px solid transparent;
       }
     }

@@ -7,6 +7,8 @@ import store from './store/index'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import vuePicturePreview from 'vue-picture-preview'
+Vue.use(vuePicturePreview);
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)

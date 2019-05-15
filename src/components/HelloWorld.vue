@@ -6,17 +6,9 @@
           <h4 class="title">Sara</h4>
           <span>I'm still in development</span>
         </div>
-        <div class="chat-inner" id="nowMessageList">
+        <div class="chat-inner">
           <div class="chat-container">
             <div v-if="getInfos.length === 0" class="chat-no-people">暂无消息,赶紧来占个沙发～</div>
-            <div v-if="getInfos.length !== 0" class="chat-loading">
-              <div class="lds-css ng-scope">
-                <div class="lds-rolling">
-                  <div>
-                  </div>
-                </div>
-              </div>
-            </div>
             <Message
               v-for="(obj,index) in getInfos"
               :key="index"
@@ -25,8 +17,10 @@
               :head="obj.src"
               :msg="obj.msg"
               :img="obj.img"
+              :videoSrc="obj.videoSrc"
               :mytime="obj.time"
               :container="container"
+              :type="obj.type"
             ></Message>
             <div class="clear"></div>
           </div>
@@ -63,6 +57,9 @@
                 </div>
               </div>
             </div>
+            <div class="fun-li video">
+              <i class="iconfont icon-BAI-shiping" @click="videoUpload"></i>
+            </div>
           </div>
           <div class="chat">
             <div class="input" @keyup.enter="submess">
@@ -70,8 +67,9 @@
             </div>
             <el-button class="demo-raised-button" type="primary" @click="submess">发送</el-button>
           </div>
-          <input id="inputFile" name='inputFile' type='file' multiple='mutiple' accept="image/*;capture=camera"
+          <input id="inputFile" name='inputFile' type='file' multiple='mutiple' accept="image/*"
                  style="display: none" @change="fileup">
+          <input type="file" accept="video/*" id="video" name="video" style="display: none" @change="uploadVideo">
         </div>
       </div>
       <div class="toggleShow" @click="handleClick">
@@ -103,13 +101,16 @@
       ...mapGetters(['getInfos'])
     },
     methods:{
-
       handleClick(){
         this.isShow = !this.isShow
       },
       imgupload() {
         const file = document.getElementById('inputFile');
         file.click();
+      },
+      videoUpload(){
+        const fileVideo = document.getElementById('video');
+        fileVideo.click();
       },
       emojiload(){
         this.emojiShow = !this.emojiShow
@@ -125,13 +126,26 @@
             src: this.src,
             img: '',
             msg,
-//            roomid: this.roomid,
-            time: new Date()
+            time: new Date(),
           };
           // 传递消息信息
           this.$store.dispatch('sendMessage',obj)
 //          socket.emit('message', obj);
           this.$store.commit('addRoomDetailInfos',obj)
+          setTimeout(()=>{
+            const resRobot = {
+              username: 'robot',
+              src: this.src,
+              img: '',
+              msg,
+              time: new Date(),
+              type: msg === '请假' ? true : false
+            };
+            this.$store.commit('addRoomDetailInfos',resRobot)
+            this.$nextTick(() => {
+              this.container.scrollTop = this.container.scrollHeight;
+            });
+          },2000)
           this.chatValue = '';
           this.$nextTick(() => {
             this.container.scrollTop = this.container.scrollHeight;
@@ -144,32 +158,95 @@
       handleFocus(){
         this.emojiShow = false
       },
-      fileup() {
+      fileup(e) {
         const that = this;
-        const file1 = document.getElementById('inputFile').files[0];
+        const file1 =e.target.files[0];
+        console.log(e.target.files[0])
+        if (!/\.(gif|jpg|jpeg|png|bmp|GIF|JPG|PNG)$/.test(e.target.value)) {
+          alert('图片类型必须是.gif,jpeg,jpg,png,bmp中的一种')
+          return false
+        }
+        if (file1.size >= 1048576) {
+          alert('图片大小不能超过1M')
+          return false;
+        }
         if (file1) {
           const formdata = new window.FormData();
           formdata.append('file', file1);
           formdata.append('username', this.userid);
           formdata.append('src', this.src);
-          formdata.append('roomid', that.roomid);
           formdata.append('time', new Date());
-          this.$store.dispatch('uploadImg', formdata);
+//          this.$store.dispatch('uploadImg', formdata);
           const fr = new window.FileReader();
           fr.onload = function () {
             const obj = {
               username: that.userid,
               src: that.src,
-              img: fr.result,
+              img: fr.result,//被选定文件的内容
               msg: '',
-              roomid: that.roomid,
               time: new Date()
             };
-            socket.emit('message', obj);
+            that.$store.dispatch('sendMessage',obj)
+            that.$store.commit('addRoomDetailInfos',obj)
+            setTimeout(()=>{
+              const resRobot = {
+                username: 'robot',
+                src: that.src,
+                img: fr.result,
+                msg: '',
+                time: new Date()
+              };
+              that.$store.commit('addRoomDetailInfos',resRobot)
+              that.$nextTick(() => {
+                that.container.scrollTop = that.container.scrollHeight;
+              });
+            },2000)
+            that.$nextTick(() => {
+              that.container.scrollTop = that.container.scrollHeight;
+            });
+            e.target.value = ''
           };
+          //读取文件内容，结果用data:url的字符串形式表示
           fr.readAsDataURL(file1);
         } else {
           console.log('必须有文件');
+        }
+      },
+      uploadVideo(e) {
+        const that = this;
+        const video = e.target.files[0];  //选择的文件
+        if(video){
+          const result = new window.FormData();
+          result.append('file', video);
+          result.append('username', this.userid);
+          result.append('src', this.src);
+          result.append('time', new Date());
+          var reader = new FileReader();
+          var rs =  reader.readAsArrayBuffer(video)
+          reader.onload = (e) => {
+            let data
+            if (typeof e.target.result === 'object') {
+              data = window.URL.createObjectURL(new Blob([e.target.result]))
+            } else {
+              data = e.target.result
+            }
+            const obj = {
+              username: that.userid,
+              src: that.src,
+              img: '',
+              msg: '',
+              videoSrc: data,
+              time: new Date()
+            };
+            that.$store.dispatch('sendMessage',obj)
+            that.$store.commit('addRoomDetailInfos',obj)
+            this.$nextTick(() => {
+              that.container.scrollTop = that.container.scrollHeight;
+            });
+            e.target.value = ''
+          }
+        }else{
+          console.log('必须有文件')
         }
       },
     },
@@ -177,14 +254,14 @@
       this.container = document.querySelector('.chat-inner');
       const that = this;
       await this.$store.commit('setRoomDetailInfos')
-      this.$refs.emoji.addEventListener('click', function(e) {
+      this.$refs.emoji.onclick = function (e) {
         console.log('11',e)
         var target = e.target || e.srcElement;
         if (!!target && target.tagName.toLowerCase() === 'span') {
           that.chatValue = that.chatValue + target.innerHTML;
         }
         e.stopPropagation();
-      });
+      }
     },
     watch: {
 //      nowMessageList: function() {
@@ -249,6 +326,18 @@
           }
         }
       }
+      .chat-inner::-webkit-scrollbar{
+        width:5px;
+      }
+      .chat-inner::-webkit-scrollbar-track{
+        box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        border-radius:5px;
+      }
+      .chat-inner::-webkit-scrollbar-thumb{
+        background-color:rgba(50, 65, 87, 0.5);
+        outline:1px solid slategrey;
+        border-radius:5px;
+      }
       .bottom {
         width: 100%;
         height: 80px;
@@ -271,6 +360,7 @@
               color: #333333;
               font-size: 19px;
               padding-left: 5px;
+              outline: none;
             }
 
             .mu-text-field {
@@ -343,76 +433,6 @@
       }
     }
   }
-
-  /*.messageContent{
-    background-color: #fff;
-    height: 50vh;
-    max-height: 425px;
-    overflow-y: auto;
-    padding-top: 10px;
-  }
-  .message{
-    margin: 10px;
-    display: flex;
-    font-size: 14px;
-    font-family: "Roboto", serif;
-  }
-  .avantar{
-    width: 40px;
-    height: 40px;
-    border-radius: 100%;
-    margin-right: 10px;
-  }
-  .response{
-    background-color: #f4f7f9;
-    color: #617287;
-    border-radius: 10px;
-    padding: 15px;
-    max-width: 215px;
-  }
-  .message-text{
-    font-size: 14px;
-    margin: 0px;
-  }
-  .markdown p {
-    padding: 0px;
-    margin: 0px;
-  }
-  .client{
-    background-color: #0084FF;
-    color: #fff;
-    border-radius: 10px;
-    padding: 8px 16px;
-    max-width: 215px;
-    text-align: left;
-    font-family: "Roboto", serif;
-    margin-left: auto;
-    overflow-wrap: break-word;
-    margin-right: 10px;
-  }
-  .sender{
-    align-items: center;
-    display: flex;
-    background-color: #f4f7f9;
-    height: 45px;
-    padding: 5px;
-  }
-  .new-message{
-    font-size: 1.1em;
-    width: 100%;
-    border: 0;
-    background-color: #f4f7f9;
-    height: 30px;
-    padding-left: 15px;
-  }
-  .send{
-    background: #f4f7f9;
-    border: 0;
-  }
-  .send-icon{
-    height: 25px;
-  }*/
-
 
 
 </style>
