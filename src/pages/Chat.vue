@@ -4,9 +4,11 @@
       <div class="container" v-show="!isShow">
         <div class="header">
           <h4 class="title">{{$t("listBar.name")}}</h4>
-          <span>{{$t("listBar.status")}}</span>
-          <span @click="changeCN">{{$t("listBar.cnLanguage")}}</span>
-          <span @click="changEN">{{$t("listBar.enLanguage")}}</span>
+          <div class="chooseLang">
+            <span>{{$t("listBar.status")}}</span>
+            <span @click="changeCN">{{$t("listBar.cnLanguage")}}</span>
+            <span @click="changEN">{{$t("listBar.enLanguage")}}</span>
+          </div>
         </div>
         <div class="chat-inner">
           <div class="chat-container">
@@ -88,7 +90,7 @@
   import {mapGetters} from 'vuex'
   import emoji from '../utils/emoji';
   import {inHTMLData} from 'xss-filters-es6';
-  import Message from './Message.vue'
+  import Message from '../components/Message.vue'
   import Swiper from 'swiper'
   import 'swiper/dist/css/swiper.min.css'
   import {_SetCookie} from '../../src/utils/util'
@@ -198,6 +200,7 @@
         this.fileTypeShow = !this.fileTypeShow
       },
       fileup(e) {
+        this.fileTypeShow = false
         const that = this;
         const file1 =e.target.files[0];
         console.log(e.target.files[0])
@@ -251,6 +254,7 @@
         }
       },
       uploadVideo(e) {
+        this.fileTypeShow = false
         const that = this;
         const video = e.target.files[0];  //选择的文件
         if(video){
@@ -352,6 +356,10 @@
           font-size: 24px;
           margin: 0;
           padding: 15px 0;
+          text-align: center;
+        }
+        .chooseLang {
+          text-align: center;
         }
         span {
           text-align: center;

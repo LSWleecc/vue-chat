@@ -1,11 +1,11 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
+import App from '../src/pages/Chat.vue'
 import router from './router'
 import store from './store/index'
-// import ElementUI from 'element-ui'
-import {DatePicker,Input,Form, FormItem,  Icon,} from 'element-ui'
+
+import {DatePicker,Input,Form, FormItem,  Icon, Button} from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueI18n from 'vue-i18n'
 import vuePicturePreview from 'vue-picture-preview'
@@ -24,6 +24,8 @@ Vue.use(Form)
 Vue.use(FormItem)
 
 Vue.use(Icon)
+
+Vue.use(Button)
 
 /* eslint-disable no-new */
 const i18n = new VueI18n({

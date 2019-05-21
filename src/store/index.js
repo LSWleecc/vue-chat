@@ -4,7 +4,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import io from 'socket.io-client'
-import url from '../api/server';
+
 Vue.use(Vuex)
 
 const socket = io('ws://localhost:5000')
