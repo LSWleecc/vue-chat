@@ -1,3 +1,4 @@
+/*
 import Axios from './axios';
 
 const Service = {
@@ -12,3 +13,4 @@ const Service = {
 
 export default Service;
 
+*/

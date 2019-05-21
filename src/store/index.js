@@ -21,11 +21,10 @@ var store = new Vuex.Store({
       current: 1,
       total: 0
     },
-    // emojiShow: false
   },
   getters: {
     getInfos: state => state.roomdetail.infos,
-    // getEmoji: state => state.emojiShow
+
   },
   mutations: {
     addRoomDetailInfos(state, data) {
@@ -39,22 +38,11 @@ var store = new Vuex.Store({
     setRoomDetailInfos(state) {
       state.roomdetail.infos = [];
     },
-    // setEmoji(state, data) {
-    //   state.emojiShow = data;
-    // },
   },
   actions: {
     sendMessage({commit},obj){
       socket.emit('sendMsg', obj)
       console.log('浏览器向服务器发送消息', obj)
-    },
-    async uploadImg({commit}, data) {
-      const res = await url.postUploadFile(data);
-      if (res) {
-        if (res.data.errno === 0) {
-          console.log('上传成功');
-        }
-      }
     },
   }
 })

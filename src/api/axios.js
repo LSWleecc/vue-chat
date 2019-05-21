@@ -1,3 +1,4 @@
+/*
 import axios from 'axios';
 
 const baseURL = '';
@@ -32,3 +33,4 @@ instance.interceptors.response.use(response => {
 });
 
 export default instance;
+*/

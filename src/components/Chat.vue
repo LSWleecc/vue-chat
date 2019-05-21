@@ -3,12 +3,14 @@
     <div class="webchat" style="position: relative">
       <div class="container" v-show="!isShow">
         <div class="header">
-          <h4 class="title">Sara</h4>
-          <span>I'm still in development</span>
+          <h4 class="title">{{$t("listBar.name")}}</h4>
+          <span>{{$t("listBar.status")}}</span>
+          <span @click="changeCN">{{$t("listBar.cnLanguage")}}</span>
+          <span @click="changEN">{{$t("listBar.enLanguage")}}</span>
         </div>
         <div class="chat-inner">
           <div class="chat-container">
-            <div v-if="getInfos.length === 0" class="chat-no-people">暂无消息,赶紧来占个沙发～</div>
+            <div v-if="getInfos.length === 0" class="chat-no-people">{{$t("listBar.messages")}}</div>
             <Message
               v-for="(obj,index) in getInfos"
               :key="index"
@@ -22,50 +24,53 @@
               :container="container"
               :type="obj.type"
             ></Message>
-            <div class="clear"></div>
           </div>
         </div>
         <div class="bottom">
-          <div class="functions">
-            <div class="fun-li" @click="imgupload">
-              <i class="iconfont icon-tupian"></i>
-            </div>
-            <div class="fun-li emoji">
-              <i class="iconfont icon-smiling" @click="emojiload"></i>
-              <div class="emoji-content" v-show="emojiShow">
-                <div class="emoji-tabs">
-                  <div class="emoji-container" ref="emoji">
-                    <div class="emoji-block" :style="{width: Math.ceil(emoji.people.length / 5) * 48 + 'px'}">
-                      <span v-for="(item, index) in emoji.people" :key="index">{{item}}</span>
-                    </div>
-                    <div class="emoji-block" :style="{width: Math.ceil(emoji.nature.length / 5) * 48 + 'px'}">
-                      <span v-for="(item, index) in emoji.nature" :key="index">{{item}}</span>
-                    </div>
-                    <div class="emoji-block" :style="{width: Math.ceil(emoji.items.length / 5) * 48 + 'px'}">
-                      <span v-for="(item, index) in emoji.items" :key="index">{{item}}</span>
-                    </div>
-                    <div class="emoji-block" :style="{width: Math.ceil(emoji.place.length / 5) * 48 + 'px'}">
-                      <span v-for="(item, index) in emoji.place" :key="index">{{item}}</span>
-                    </div>
-                    <div class="emoji-block" :style="{width: Math.ceil(emoji.single.length / 5) * 48 + 'px'}">
-                      <span v-for="(item, index) in emoji.single" :key="index">{{item}}</span>
-                    </div>
-                  </div>
-                  <div class="tab">
-
-                  </div>
+          <div class="chooseFileType" v-show="fileTypeShow">
+            <div class="image">
+              <div>
+                <div class="choseBtn">
+                  <i class="iconfont icon-tupian" @click="imgupload"></i>
                 </div>
               </div>
+              <div class="name">图片</div>
             </div>
-            <div class="fun-li video">
-              <i class="iconfont icon-BAI-shiping" @click="videoUpload"></i>
+            <div class="video">
+              <div>
+                <div class="choseBtn">
+                  <i class="iconfont icon-BAI-shiping" @click="videoUpload"></i>
+                </div>
+              </div>
+              <div class="name">视屏</div>
             </div>
           </div>
           <div class="chat">
             <div class="input" @keyup.enter="submess">
-              <input type="text" @focus="handleFocus" v-model="chatValue">
+              <input type="text" ref="starts" @focus="handleFocus" v-model="chatValue">
             </div>
-            <el-button class="demo-raised-button" type="primary" @click="submess">发送</el-button>
+            <div class="emoji">
+              <div class="chooseFile">
+                <i class="iconfont icon-smiling" @click="emojiload"></i>
+                <div class="emoji-content" v-show="emojiShow">
+                  <div class="emoji-tabs swiper-container">
+                    <div class="emoji-container swiper-wrapper" ref="emoji">
+                      <div class="emoji-block swiper-slide" v-for="(categorys,index) in categoryArray" :key="index">
+                        <div>
+                          <span v-for="(item, index) in categorys" :key="index">{{item}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="more" v-if="!chatValue">
+              <i class="iconfont icon-jiahao" @click="handleMore"></i>
+            </div>
+            <div class="demo-raised-button" v-else>
+              <i class="iconfont icon-fasong" @click="submess"></i>
+            </div>
           </div>
           <input id="inputFile" name='inputFile' type='file' multiple='mutiple' accept="image/*"
                  style="display: none" @change="fileup">
@@ -84,6 +89,9 @@
   import emoji from '../utils/emoji';
   import {inHTMLData} from 'xss-filters-es6';
   import Message from './Message.vue'
+  import Swiper from 'swiper'
+  import 'swiper/dist/css/swiper.min.css'
+  import {_SetCookie} from '../../src/utils/util'
   export default {
     data(){
       return{
@@ -94,11 +102,33 @@
         chatValue: '',
         emojiShow: false,
         userid: 'lswlee',
-        src: '//s3.qiufengh.com/avatar/hoster.jpg'
+        src: '//s3.qiufengh.com/avatar/hoster.jpg',
+        fileTypeShow: false,
+        lang: '中文'
       }
     },
     computed: {
-      ...mapGetters(['getInfos'])
+      ...mapGetters(['getInfos']),
+      categoryArray(){
+        const {people} = this.emoji
+        const bigArray = []
+
+        let smallArray = []
+        people.forEach(c => {
+          if(smallArray.length===0){
+            bigArray.push(smallArray)
+          }
+          smallArray.push(c)
+
+          if(smallArray.length===35){
+            smallArray = []
+          }
+        })
+        return bigArray
+      },
+      emojiTypes(){
+        return Object.keys(this.emoji)
+      }
     },
     methods:{
       handleClick(){
@@ -113,12 +143,15 @@
         fileVideo.click();
       },
       emojiload(){
+        if(this.fileTypeShow){
+          this.fileTypeShow = false
+        }
         this.emojiShow = !this.emojiShow
       },
       submess() {
-        this.emojiShow = false
         // 判断发送信息是否为空
         if (this.chatValue !== '') {
+          this.emojiShow = false
           const msg = inHTMLData(this.chatValue); // 防止xss
           let id = this.id
           const obj = {
@@ -130,7 +163,6 @@
           };
           // 传递消息信息
           this.$store.dispatch('sendMessage',obj)
-//          socket.emit('message', obj);
           this.$store.commit('addRoomDetailInfos',obj)
           setTimeout(()=>{
             const resRobot = {
@@ -157,6 +189,13 @@
       },
       handleFocus(){
         this.emojiShow = false
+        this.fileTypeShow = false
+      },
+      handleMore(){
+        if(this.emojiShow){
+          this.emojiShow = false
+        }
+        this.fileTypeShow = !this.fileTypeShow
       },
       fileup(e) {
         const that = this;
@@ -176,7 +215,6 @@
           formdata.append('username', this.userid);
           formdata.append('src', this.src);
           formdata.append('time', new Date());
-//          this.$store.dispatch('uploadImg', formdata);
           const fr = new window.FileReader();
           fr.onload = function () {
             const obj = {
@@ -249,6 +287,22 @@
           console.log('必须有文件')
         }
       },
+      _initSwiper(){
+        var mySwiper = new Swiper('.swiper-container',{
+          observer:true,
+          observeParents:true
+        })
+      },
+      changeCN(){
+        this.lang = '中文';
+        this.$i18n.locale = 'zh-CN'
+        _SetCookie('PLAY_LANG','zh-CN',1)
+      },
+      changEN(){
+        this.lang = 'English';
+        this.$i18n.locale = 'en-US'
+        _SetCookie('PLAY_LANG','en-US',1)
+      }
     },
     async mounted(){
       this.container = document.querySelector('.chat-inner');
@@ -262,14 +316,10 @@
         }
         e.stopPropagation();
       }
+      this._initSwiper()
     },
     watch: {
-//      nowMessageList: function() {
-//        this.$nextTick(() => {
-//          document.body.scrollTop = document.body.scrollHeight;
-//          console.log(document.body.scrollTop);
-//        });
-//      }
+
     },
     components:{
       Message
@@ -306,8 +356,8 @@
         span {
           text-align: center;
           color: #2c3e50;
+          cursor: pointer;
         }
-
       }
       .chat-inner {
         background-color: #fff;
@@ -340,13 +390,23 @@
       }
       .bottom {
         width: 100%;
-        height: 80px;
+        height: 50px;
         border-top: 1px solid #ddd;
         background: #f7f6fb;
         .chat {
           width: 100%;
           display: flex;
-
+          position: relative;
+          .emoji,.more,.demo-raised-button {
+            width: 30px;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 5px;
+            .iconfont {
+              font-size: 25px;
+              cursor: pointer;
+            }
+          }
           .input {
             flex: 1;
             padding: 0 4px 4px 4px;
@@ -363,59 +423,27 @@
               outline: none;
             }
 
-            .mu-text-field {
-              width: 100%;
-            }
-          }
-
-          .demo-raised-button {
-            margin-right: 8px;
-            min-width: 80px;
-            width: 80px;
-            height: 40px;
-            background: #eeeff3;
-            color: #8c8c96;
           }
         }
 
-        .functions {
+        .chooseFile {
           width: 100%;
           display: flex;
-          .fun-li {
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            display: inline-block;
-            position: relative;
-            color: #828187;
-            text-align: center;
-
-            .iconfont {
-              font-size: 20px;
-            }
-          }
-
           .emoji-content {
             position: absolute;
-            bottom: 30px;
-            left: -30px;
+            bottom: 48px;
+            left: 0px;
             width: 370px;
             height: 210px;
             border-top: 1px solid #f3f3f3;
-            overflow: hidden;
             background-color: #fff;
-
             .emoji-container {
-              width: 10000px;
+              width: 100%;
+              height: 100%;
             }
 
             .emoji-tabs {
-              overflow: auto;
-
               .emoji-block {
-                width: 1170px;
-                height: 200px;
-                float: left;
 
                 span {
                   display: inline-block;
@@ -428,6 +456,45 @@
                 }
               }
             }
+            .tab {
+              width: 100%;
+              height: 38px;
+              border: 1px solid red;
+              display: flex;
+              .emojiType {
+                display: flex;
+
+              }
+            }
+          }
+        }
+        .chooseFileType {
+          width: 100%;
+          height: 100px;
+          background: #fff;
+          border-top: 1px solid #f3f3f3;
+          position: absolute;
+          left: 0px;
+          bottom: 85px;
+          display: flex;
+          align-items: center;
+          .choseBtn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .iconfont {
+              font-size: 32px;
+              color: #828187;
+            }
+          }
+          .image,.video {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #828187;
+            margin-left: 20px;
+            border-radius: 5px;
           }
         }
       }
