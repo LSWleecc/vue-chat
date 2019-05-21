@@ -90,7 +90,7 @@
                   <div class="chat-box-title">
                     <div class="content has-text-centered">
                       <h1 class="title has-text-white">
-                        <em>{{$t("listBar.name")}}</em>
+                        {{$t("listBar.name")}}
                       </h1>
                       <h3 class="subtitle has-text-white">
                         <span>{{$t("listBar.status")}}</span>
