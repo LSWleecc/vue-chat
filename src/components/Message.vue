@@ -81,6 +81,13 @@
   };
 </script>
 <style lang="scss" scoped>
+div {
+  border: 1px solid #ccc;
+}
+
+span {
+  border: 1px solid red;
+}
   .clear {
     .item {
       max-width: 90%;

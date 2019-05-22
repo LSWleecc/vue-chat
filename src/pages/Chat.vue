@@ -1,103 +1,6 @@
 <template>
   <div>
     <div class="webchat" style="position: relative">
-      <!-- <div class="container" v-show="!isShow">
-        <div class="header">
-          <h4 class="title">{{$t("listBar.name")}}</h4>
-          <div class="chooseLang">
-            <span>{{$t("listBar.status")}}</span>
-            <span @click="changeCN">{{$t("listBar.cnLanguage")}}</span>
-            <span @click="changEN">{{$t("listBar.enLanguage")}}</span>
-          </div>
-        </div>
-        <div class="chat-inner">
-          <div class="chat-container">
-            <div v-if="getInfos.length === 0" class="chat-no-people">{{$t("listBar.messages")}}</div>
-            <Message
-              v-for="(obj,index) in getInfos"
-              :key="index"
-              :is-self="obj.username === userid"
-              :name="obj.username"
-              :head="obj.src"
-              :msg="obj.msg"
-              :img="obj.img"
-              :videoSrc="obj.videoSrc"
-              :mytime="obj.time"
-              :container="container"
-              :type="obj.type"
-            ></Message>
-          </div>
-        </div>
-        <div class="bottom">
-                    <div class="chooseFileType" v-show="fileTypeShow">
-                      <div class="image">
-                        <div>
-                          <div class="choseBtn">
-                            <i class="iconfont icon-tupian" @click="imgupload"></i>
-                          </div>
-                        </div>
-                        <div class="name">图片</div>
-                      </div>
-                      <div class="video">
-                        <div>
-                          <div class="choseBtn">
-                            <i class="iconfont icon-BAI-shiping" @click="videoUpload"></i>
-                          </div>
-                        </div>
-                        <div class="name">视屏</div>
-                      </div>
-                    </div>
-                    <div class="chat">
-                      <div class="input" @keyup.enter="submess">
-                        <input type="text" ref="starts" @focus="handleFocus" v-model="chatValue">
-                      </div>
-                      <div class="emoji">
-                        <div class="chooseFile">
-                          <i class="iconfont icon-smiling" @click="emojiload"></i>
-                          <div class="emoji-content" v-show="emojiShow">
-                            <div class="emoji-tabs swiper-container">
-                              <div class="emoji-container swiper-wrapper" ref="emoji">
-                                <div
-                                  class="emoji-block swiper-slide"
-                                  v-for="(categorys,index) in categoryArray"
-                                  :key="index"
-                                >
-                                  <div>
-                                    <span v-for="(item, index) in categorys" :key="index">{{item}}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="more" v-if="!chatValue">
-                        <i class="iconfont icon-jiahao" @click="handleMore"></i>
-                      </div>
-                      <div class="demo-raised-button" v-else>
-                        <i class="iconfont icon-fasong" @click="submess"></i>
-                      </div>
-                    </div>
-                    <input
-                      id="inputFile"
-                      name="inputFile"
-                      type="file"
-                      multiple="mutiple"
-                      accept="image/*"
-                      style="display: none"
-                      @change="fileup"
-                    >
-                    <input
-                      type="file"
-                      accept="video/*"
-                      id="video"
-                      name="video"
-                      style="display: none"
-                      @change="uploadVideo"
-                    >
-                  </div>
-      </div>-->
-      <!-- 容器 -->
       <section class="hero is-fullheight">
         <div class="hero-body is-paddingless" v-show="!isShow">
           <div class="container has-text-centered">
@@ -234,100 +137,18 @@
                     ></Message>
                   </div>
                   <!-- bottom -->
-
-                  <div class="chat-box-input">
+                  <div class="chat-box-bottom">
                     <div class="card is-clearfix is-shadowless">
-                      <!-- <div class="card-left is-pulled-left is-clearfix"> -->
-                      <!-- 只在移动端显示的输入框 -->
-                      <!-- <div class="field is-marginless has-addons is-fullwidth">
-                        <div class="control is-expanded">
-                          <input type="text" class="input is-hidden-desktop">
-                        </div>
-                        <div class="control">
-                          <div class="media-box">
-                            <div class="dropdown is-up" :class="{'is-active':emojiShow}">
-                              <div class="dropdown-trigger point">
-                                <i class="iconfont icon-smiling" @click="emojiload"></i>
-                              </div>
-                              <div class="dropdown-menu" id="dropdown-menu7" role="menu">
-                                <div class="dropdown-content">
-                                  <div class="dropdown-item">
-                                    <div class="emoji-content">
-                                      <div class="emoji-tabs swiper-container">
-                                        <div class="emoji-container swiper-wrapper" ref="emoji">
-                                          <div
-                                            class="emoji-block swiper-slide"
-                                            v-for="(categorys,index) in categoryArray"
-                                            :key="index"
-                                          >
-                                            <div>
-                                              <span
-                                                class="point"
-                                                v-for="(item, index) in categorys"
-                                                :key="index"
-                                              >{{item}}</span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              class="dropdown is-up"
-                              :class="{'is-active':fileTypeShow}"
-                              v-if="!chatValue"
-                            >
-                              <div class="dropdown-trigger point">
-                                <i class="iconfont icon-jiahao" @click="handleMore"></i>
-                              </div>
-                              <input
-                                id="inputFile"
-                                name="inputFile"
-                                type="file"
-                                multiple="mutiple"
-                                accept="image/*"
-                                style="display: none"
-                                @change="fileup"
-                              >
-                              <input
-                                type="file"
-                                accept="video/*"
-                                id="video"
-                                name="video"
-                                style="display: none"
-                                @change="uploadVideo"
-                              >
-
-                              <div class="dropdown-menu" id="dropdown-menu7" role="menu">
-                                <div class="dropdown-content">
-                                  <div class="dropdown-item">
-                                    <div class="is-clearfix">
-                                      <div class="image-box is-pulled-left">
-                                        <i class="iconfont icon-tupian" @click="imgupload"></i>
-                                        <div class="name">图片</div>
-                                      </div>
-                                      <div class="video-box is-pulled-left">
-                                        <i class="iconfont icon-BAI-shiping" @click="videoUpload"></i>
-                                        <div class="name">视频</div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>-->
                       <div class="card-left is-clearfix">
                         <div class="input-box is-pulled-left is-hidden-desktop">
-                          <input type="text" class="input"
-                          ref="starts"
-                      @focus="handleFocus"
-                      v-model="chatValue"
-                      autofocus>
+                          <input
+                            type="text"
+                            class="input"
+                            ref="starts"
+                            @focus="handleFocus"
+                            v-model="chatValue"
+                            autofocus
+                          >
                         </div>
                         <div class="media-box">
                           <div class="dropdown is-up" :class="{'is-active':emojiShow}">
@@ -337,7 +158,7 @@
                             <div class="dropdown-menu" id="dropdown-menu7" role="menu">
                               <div class="dropdown-content">
                                 <div class="dropdown-item">
-                                  <div class="emoji-content">
+                                  <div class="emoji-content has-background-white">
                                     <div class="emoji-tabs swiper-container">
                                       <div class="emoji-container swiper-wrapper" ref="emoji">
                                         <div
@@ -347,7 +168,7 @@
                                         >
                                           <div>
                                             <span
-                                              class="point"
+                                              class="emoji-face point is-inline-block"
                                               v-for="(item, index) in categorys"
                                               :key="index"
                                             >{{item}}</span>
@@ -360,7 +181,11 @@
                               </div>
                             </div>
                           </div>
-                          <div class="dropdown is-up" :class="{'is-active':fileTypeShow}" v-if="!chatValue">
+                          <div
+                            class="dropdown is-up"
+                            :class="{'is-active':fileTypeShow}"
+                            v-if="!chatValue"
+                          >
                             <div class="dropdown-trigger point">
                               <i class="iconfont icon-jiahao" @click="handleMore"></i>
                             </div>
@@ -381,7 +206,6 @@
                               style="display: none"
                               @change="uploadVideo"
                             >
-
                             <div class="dropdown-menu" id="dropdown-menu7" role="menu">
                               <div class="dropdown-content">
                                 <div class="dropdown-item">
@@ -399,22 +223,16 @@
                               </div>
                             </div>
                           </div>
-                            <!-- ----------- -->
-                            <span class="demo-raised-button" v-else>
-                                <i class="iconfont icon-fasong" @click="submess"></i>
-                            </span>
-                            <!-- ----------- -->
+                          <span class="demo-raised-button is-hidden-desktop" v-else>
+                            <i class="iconfont icon-fasong" @click="submess"></i>
+                          </span>
                         </div>
-                     
                         <button
                           class="button submit-btn is-rounded is-shadowless is-pulled-right is-hidden-touch"
                           @click="submess"
                         >发送</button>
-                       
                       </div>
-
                       <!-- <div class="card-right is-pulled-right">
-                        
                       </div>-->
                     </div>
                     <!-- textarea限制字数 -->
@@ -703,7 +521,7 @@ export default {
 div {
   // border: 1px solid #ccc;
 }
-
+// hero-body
 .chat-box {
   border: 1px solid #ccc;
   border-radius: 10px 10px 0 0;
@@ -715,52 +533,35 @@ div {
       background: linear-gradient(to bottom left, #524ad0, #d099fa);
     }
   }
-}
 
-.is-shady {
-  background: #fff;
-  box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0;
-  transition: all 0.2s ease-in-out;
-  &:hover {
-    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.13), 0 6px 6px rgba(0, 0, 0, 0.19);
-  }
-}
-
-/* content */
-.chat-box-content {
-  padding: 1rem 0.5rem;
-  // max-height: 320px;
-  // min-height: 280px;
-  // height: 190px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-.submit-btn {
-  border: 1px solid #524ad0;
-  &:hover {
-    background: linear-gradient(to bottom left, #524ad0 10%, #d099fa);
-    color: #fff;
-  }
-}
-
-/* bottom */
-.chat-box-input {
-  .card {
-    padding: 0.25rem;
-    // border-top: 1px solid #ccc;
-    // border-bottom: 1px solid #ccc;
-    background: linear-gradient(to bottom left, #524ad0, #d099fa);
-    .dropdown {
-      margin-right: 0.25rem;
-      // .dropdown-item {
-      //   padding: .5rem;
-      // }
+  .chat-box-content {
+    padding: 1rem 0.5rem;
+    // max-height: 320px;
+    // min-height: 280px;
+    // height: 190px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    .chat-no-people {
+      margin-top: 3rem;
     }
   }
-  .textarea {
-    resize: none;
-    border: 0;
+
+  .chat-box-bottom {
+    .card {
+      padding: 0.25rem;
+      // border-top: 1px solid #ccc;
+      // border-bottom: 1px solid #ccc;
+      background: linear-gradient(to bottom left, #524ad0, #d099fa);
+
+      .dropdown {
+        margin-right: 0.25rem;
+      }
+    }
+
+    .textarea {
+      resize: none;
+      border: 0;
+    }
   }
 }
 
@@ -773,6 +574,14 @@ div {
 
 .image-box {
   margin-right: 1rem;
+}
+
+.submit-btn {
+  border: 1px solid #524ad0;
+  &:hover {
+    background: linear-gradient(to bottom left, #524ad0 10%, #d099fa);
+    color: #fff;
+  }
 }
 
 .icon-smiling,
@@ -790,181 +599,25 @@ div {
   cursor: pointer;
 }
 
-// .active {
-//   transform: rotateZ(45deg);
-//   transition: transform linear 0.2s;
-// }
-// .inifit {
-//   transform: rotateZ(-45deg);
-//   transition: transform linear 0.2s;
-// }
-// .webchat {
-//   width: 370px;
-//   height: 600px;
-//   border-radius: 5px;
-//   margin: 0 auto;
-//   .container {
-//     box-shadow: 0 1px 8px 0 rgba(122, 107, 107, 0.22);
-//     -webkit-box-shadow: 0 1px 8px 0 rgba(122, 107, 107, 0.22);
-//     .header {
-//       width: 370px;
-//       height: 87px;
-//       background: slateblue;
-//       .title {
-//         color: #fff;
-//         font-size: 24px;
-//         margin: 0;
-//         padding: 15px 0;
-//         text-align: center;
-//       }
-//       .chooseLang {
-//         text-align: center;
-//       }
-//       span {
-//         text-align: center;
-//         color: #2c3e50;
-//         cursor: pointer;
-//       }
-//     }
-//     .chat-box-content {
-//       background-color: #fff;
-//       height: 50vh;
-//       max-height: 425px;
-//       overflow-y: auto;
-//       padding-top: 10px;
-//       .chat-container {
-//         overflow: hidden;
-//         .chat-no-people {
-//           width: 100%;
-//           height: 415px;
-//           line-height: 415px;
-//           text-align: center;
-//           color: #d1cfd2;
-//         }
-//       }
-//     }
-//     .chat-box-content::-webkit-scrollbar {
-//       width: 5px;
-//     }
-//     .chat-box-content::-webkit-scrollbar-track {
-//       box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-//       border-radius: 5px;
-//     }
-//     .chat-box-content::-webkit-scrollbar-thumb {
-//       background-color: rgba(50, 65, 87, 0.5);
-//       outline: 1px solid slategrey;
-//       border-radius: 5px;
-//     }
-//     .bottom {
-//       width: 100%;
-//       height: 50px;
-//       border-top: 1px solid #ddd;
-//       background: #f7f6fb;
-//       .chat {
-//         width: 100%;
-//         display: flex;
-//         position: relative;
-// .emoji,
-// .more,
-// .demo-raised-button {
-//   width: 30px;
-//   text-align: center;
-//   line-height: 40px;
-//   margin-right: 5px;
-// .iconfont {
-//   font-size: 25px;
-//   cursor: pointer;
-// }
-// }
-//         .input {
-//           flex: 1;
-//           padding: 0 4px 4px 4px;
-
-//           input {
-//             width: 100%;
-//             height: 42px;
-//             box-sizing: border-box;
-//             border: 1px solid #e8e7ea;
-//             border-radius: 3px;
-//             color: #333333;
-//             font-size: 19px;
-//             padding-left: 5px;
-//             outline: none;
-//           }
-//         }
-//       }
-
-//       .chooseFile {
-//         width: 100%;
-//         display: flex;
 .emoji-content {
   width: 370px;
   height: 210px;
-  // border-top: 1px solid #f3f3f3;
-  background-color: #fff;
-  .emoji-container {
-    // float: left;
-    // width: 100%;
-    // height: 100%;
+  .emoji-face {
+    font-size: 1.8rem;
+    min-width: 3rem;
   }
+}
 
-  .emoji-tabs {
-    .emoji-block {
-      span {
-        display: inline-block;
-        // cursor: pointer;
-        font-size: 26px;
-        min-width: 48px;
-        line-height: 39px;
-        text-align: center;
-        list-style: none;
-      }
-    }
-  }
-  //           .tab {
-  //             width: 100%;
-  //             height: 38px;
-  //             border: 1px solid red;
-  //             display: flex;
-  // .emojiType {
-  //   display: flex;
-  // }
+// hero-footer
+.active {
+  transform: rotateZ(45deg);
+  transition: transform linear 0.2s;
 }
-//         }
-//       }
-.chooseFileType {
-  // width: 100%;
-  height: 100px;
-  background: #fff;
-  // border-top: 1px solid #f3f3f3;
-  // position: absolute;
-  // left: 0px;
-  // bottom: 85px;
-  display: flex;
-  align-items: center;
-  .choseBtn {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .iconfont {
-      font-size: 32px;
-      color: #828187;
-    }
-  }
-  .image,
-  .video {
-    width: 50px;
-    height: 50px;
-    border: 1px solid #828187;
-    margin-left: 20px;
-    border-radius: 5px;
-  }
+.inifit {
+  transform: rotateZ(-45deg);
+  transition: transform linear 0.2s;
 }
-//     }
-//   }
-// }
+
 @media screen and(max-width: 1024px) {
   .chat-box-content {
     height: 450px;
@@ -979,10 +632,21 @@ div {
 }
 
 @media screen and(min-width: 1024px) {
+  // 容器阴影
+  .is-shady {
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 1px 0;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+      box-shadow: 0 10px 16px rgba(0, 0, 0, 0.13), 0 6px 6px rgba(0, 0, 0, 0.19);
+    }
+  }
+
   .chat-box-content {
     max-height: 320px;
     min-height: 280px;
   }
+
   .media-box {
     float: left;
   }
