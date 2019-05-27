@@ -11,6 +11,9 @@
           </div>
         </div>
         <div class="chat-inner">
+          <div class="connect-status">
+            <h3>{{connectStated}}</h3>
+          </div>
           <div class="chat-container">
             <div v-if="getInfos.length === 0" class="chat-no-people">{{$t("listBar.messages")}}</div>
             <Message
@@ -94,6 +97,8 @@
   import Swiper from 'swiper'
   import 'swiper/dist/css/swiper.min.css'
   import {_SetCookie} from '../../src/utils/util'
+  import io from 'socket.io-client'
+
   export default {
     data(){
       return{
@@ -106,15 +111,25 @@
         userid: 'lswlee',
         src: '//s3.qiufengh.com/avatar/hoster.jpg',
         fileTypeShow: false,
-        lang: '中文'
+        lang: '中文',
+        websock: null,//建立的连接
+        lockReconnect: false,//是否真正建立连接
+        timeout: 30*1000,//一次心跳
+        timeoutObj: null,//心跳倒计时
+        serverTimeoutObj: null,//心跳倒计时
+        timeoutnum: null,//断开 重连倒计时
+        connectStated: '',
       }
+    },
+    created (){
+      //页面刚进入时开启长连接
+      this.initWebSocket();
     },
     computed: {
       ...mapGetters(['getInfos']),
       categoryArray(){
         const {people} = this.emoji
         const bigArray = []
-
         let smallArray = []
         people.forEach(c => {
           if(smallArray.length===0){
@@ -128,9 +143,6 @@
         })
         return bigArray
       },
-      emojiTypes(){
-        return Object.keys(this.emoji)
-      }
     },
     methods:{
       handleClick(){
@@ -164,7 +176,7 @@
             time: new Date(),
           };
           // 传递消息信息
-          this.$store.dispatch('sendMessage',obj)
+          this.websocketsend(obj)
           this.$store.commit('addRoomDetailInfos',obj)
           setTimeout(()=>{
             const resRobot = {
@@ -183,7 +195,6 @@
           this.chatValue = '';
           this.$nextTick(() => {
             this.container.scrollTop = this.container.scrollHeight;
-            console.log(this.container.scrollHeight,this.container.scrollTop)
           });
         } else {
           return
@@ -227,7 +238,7 @@
               msg: '',
               time: new Date()
             };
-            that.$store.dispatch('sendMessage',obj)
+            that.websocketsend(obj)
             that.$store.commit('addRoomDetailInfos',obj)
             setTimeout(()=>{
               const resRobot = {
@@ -280,7 +291,8 @@
               videoSrc: data,
               time: new Date()
             };
-            that.$store.dispatch('sendMessage',obj)
+//            that.$store.dispatch('sendMessage',obj)
+            that.websocketsend(obj)
             that.$store.commit('addRoomDetailInfos',obj)
             this.$nextTick(() => {
               that.container.scrollTop = that.container.scrollHeight;
@@ -306,6 +318,100 @@
         this.lang = 'English';
         this.$i18n.locale = 'en-US'
         _SetCookie('PLAY_LANG','en-US',1)
+      },
+      initWebSocket(){//建立连接
+        const wsuri = "ws://localhost:5000"
+        //建立连接
+        this.websock = io(wsuri)
+        //连接成功
+        this.websock.on('connect',this.websocketonopen)
+        //连接错误
+        this.websock.on('error',this.websocketonerror)
+        //接收信息
+        this.websock.on('receiveMsg',this.websocketonmessage)
+        //连接关闭
+        this.websock.on('close',this.websocketclose)
+      },
+      reconnect() {
+        console.log('重连')
+        //重新连接
+        var that = this;
+        if(that.lockReconnect) {
+          return;
+        };
+        that.lockReconnect = true;
+        //没连接上会一直重连，设置延迟避免请求过多
+        that.timeoutnum && clearTimeout(that.timeoutnum);
+        that.timeoutnum = setTimeout(function () {
+          //新连接
+          that.initWebSocket();
+          that.lockReconnect = false;
+          this.connectStated = '连接成功'
+        },5000);
+      },
+      reset(){
+        //重置心跳
+        var that = this;
+        //清除时间
+        clearTimeout(that.timeoutObj);
+        clearTimeout(that.serverTimeoutObj);
+        //重启心跳
+        that.start();
+      },
+      start(){
+        //开启心跳
+        var self = this;
+        self.timeoutObj && clearTimeout(self.timeoutObj);
+        self.serverTimeoutObj && clearTimeout(self.serverTimeoutObj);
+        self.timeoutObj = setTimeout(function(){
+          //这里发送一个心跳，后端收到后，返回一个心跳消息，
+          //onmessage拿到返回的心跳就说明连接正常
+          if (self.websock.connected == true) {//如果连接正常
+            self.websock.emit("heartCheck")
+            console.log('连接正常')
+          }else{//否则重连
+            self.reconnect();
+          }
+          self.serverTimeoutObj = setTimeout(function() {
+            //超时关闭
+            self.websock.close();
+            console.log('连接超时')
+            self.connectStated = '连接断开'
+          }, self.timeout);
+
+        }, self.timeout)//30
+      },
+      websocketonopen() {
+        //提示成功
+        this.connectStated = '连接成功'
+        console.log('连接成功')
+        //开启心跳
+        this.start();
+      },
+      websocketonerror(e) {
+        //连接失败事件
+        console.log("WebSocket连接发生错误");
+        this.connectStated = '连接断开'
+        //重连
+        this.reconnect();
+      },
+      websocketclose(e) {
+        //关闭
+        console.log('已关闭')
+        this.connectStated = '连接断开'
+        //重连
+        this.reconnect();
+      },
+      websocketonmessage(event) {
+        //接收服务器推送的信息
+        console.log('浏览器接收到服务器消息', event)
+        //收到服务器信息，心跳重置
+        this.reset();
+      },
+      websocketsend(obj) {
+        //向服务器发送信息
+        this.websock.emit('sendMsg', obj)
+        console.log('浏览器向服务器发送消息', obj)
       }
     },
     async mounted(){
@@ -324,6 +430,10 @@
     },
     watch: {
 
+    },
+    destroyed(){
+      //页面销毁时关闭长连接
+      this.websocketclose();
     },
     components:{
       Message
@@ -351,6 +461,7 @@
         width: 370px;
         height: 87px;
         background: slateblue;
+        position: relative;
         .title {
           color: #fff;
           font-size: 24px;
@@ -373,6 +484,7 @@
         max-height: 425px;
         overflow-y: auto;
         padding-top: 10px;
+        margin-top: 20px;
         .chat-container {
           overflow: hidden;
           .chat-no-people {
@@ -383,7 +495,16 @@
             color: #D1CFD2;
           }
         }
+        .connect-status {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 75px;
+          bottom: 0;
+          margin: auto;
+        }
       }
+
       .chat-inner::-webkit-scrollbar{
         width:5px;
       }

@@ -10,6 +10,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import VueI18n from 'vue-i18n'
 import vuePicturePreview from 'vue-picture-preview'
 import {_getCookie} from '../src/utils/util'
+import './assets/iconfont/iconfont.css'
+
 Vue.use(vuePicturePreview);
 Vue.use(VueI18n) // 通过插件的形式挂载
 Vue.config.productionTip = false

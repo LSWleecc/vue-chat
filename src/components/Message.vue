@@ -59,7 +59,9 @@
       },
       avatar() {
         let avatar = this.head;
+//        //s3.qiufengh.com/avatar/hoster.jpg
         return `${avatar}?imageView2/2/w/120/h/120`;
+//        //s3.qiufengh.com/avatar/hoster.jpg?imageView2/2/w/120/h/120
       },
       pic() {
         let pic = this.img;

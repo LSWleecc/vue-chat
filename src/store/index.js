@@ -3,15 +3,18 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import io from 'socket.io-client'
+import WebSocket from 'socket.io-client'
 
 Vue.use(Vuex)
 
-const socket = io('ws://localhost:5000')
+// const socket = io('ws://localhost:5000')
 
-socket.on('receiveMsg', function (data) {
-  console.log('浏览器接收到服务器消息', data)
-});
+// socket.on('receiveMsg', function (data) {
+//   console.log('浏览器接收到服务器消息', data)
+//   console.log(socket,'fff')
+// });
+
+
 var store = new Vuex.Store({
   state: {
     roomdetail: {
@@ -41,8 +44,7 @@ var store = new Vuex.Store({
   },
   actions: {
     sendMessage({commit},obj){
-      socket.emit('sendMsg', obj)
-      console.log('浏览器向服务器发送消息', obj)
+      // socket.emit('sendMsg', obj)
     },
   }
 })
