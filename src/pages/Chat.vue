@@ -124,6 +124,8 @@
     created (){
       //页面刚进入时开启长连接
       this.initWebSocket();
+      const result = 'xxx'
+      console.log(result)
     },
     computed: {
       ...mapGetters(['getInfos']),
@@ -346,7 +348,7 @@
           //新连接
           that.initWebSocket();
           that.lockReconnect = false;
-          this.connectStated = '连接成功'
+          that.connectStated = '连接成功'
         },5000);
       },
       reset(){
