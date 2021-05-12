@@ -14,7 +14,7 @@
     "axios": "^0.18.0",
     "element-ui": "^2.8.2",
     "socket.io": "^2.2.0",
-    "swiper": "^4.5.0",
+    "swiper": "^6.5.1",
     "vue": "^2.5.2",
     "vue-i18n": "^8.11.2",
     "vue-picture-preview": "^1.2.1",
